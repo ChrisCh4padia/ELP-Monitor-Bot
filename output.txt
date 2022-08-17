@@ -1,0 +1,5 @@
+name: EL Products UG (haftungsbeschränkt)
+court: Bavaria   District court Deggendorf HRB 5317
+state: Deggendorf
+status: currently registered
+history:
