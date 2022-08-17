@@ -30,7 +30,7 @@ func ClearDir(dir string) error {
 
 func compare() {
 
-	outstr := string(out)
+	outstr = string(out)
 
 	if outstr == content {
 
