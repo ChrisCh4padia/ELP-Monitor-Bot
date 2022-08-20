@@ -6,7 +6,9 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
@@ -25,8 +27,10 @@ var TwaccessTokenSecret string = ""
 var outstr string
 var out []byte
 var err error
-var diff string
+var txtdiff string
 var Tweetcontent string
+var counter int = 1
+var counterstr string
 
 func ClearDir(dir string) error {
 	files, err := filepath.Glob(filepath.Join(dir, "*"))
@@ -47,7 +51,6 @@ func compare() {
 	outstr = string(out)
 
 	if outstr == content {
-		fmt.Println("nothing changed")
 	} else {
 		getdiff()
 	}
@@ -68,7 +71,7 @@ func callHR() {
 }
 
 func getdiff() {
-	diff = (strings.Replace(outstr, content, "", 1))
+	txtdiff = (strings.Replace(outstr, content, "", 1))
 }
 
 func removeleftover() {
@@ -81,11 +84,18 @@ func removeleftover() {
 }
 
 func Tweetoutput() {
-
-	if diff == "" {
-		Tweetcontent = "No Changes in the last x Days"
+	counterstr = strconv.Itoa(counter)
+	if txtdiff == "" {
+		if counter == 1 {
+			Tweetcontent = "No changes in the last day"
+			counter = counter + 1
+		} else {
+			Tweetcontent = "No changes in the last " + counterstr + " days"
+			counter = counter + 1
+		}
 	} else {
-		Tweetcontent = "New Change in Handelsregister:" + "\n" + diff
+		Tweetcontent = "New change in handelsregister:" + "\n" + txtdiff
+		counter = 1
 	}
 
 	config := oauth1.NewConfig(TwconsumerKey, TwconsumerSecret)
@@ -108,9 +118,13 @@ func Tweetoutput() {
 
 func main() {
 
-	callHR()
-	compare()
-	getdiff()
-	removeleftover()
-	Tweetoutput()
+	for {
+		callHR()
+		compare()
+		getdiff()
+		removeleftover()
+		Tweetoutput()
+		txtdiff = ""
+		time.Sleep(24 * time.Hour)
+	}
 }
